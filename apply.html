@@ -1,0 +1,50 @@
+<script>
+  const utilsModule = ((Function) => {
+    Function.prototype.myApply = function (obj, arr) {
+      obj = obj == null ? window : Object(obj)
+      let args = [];
+      let val;
+      for (let i = 0; i < arr.length; i++) {
+        args.push('arr[' + i + ']');
+      }
+      obj._fn_ = this;
+      val = eval('obj._fn_(' + args + ')')
+      delete obj._fn_;
+      return val
+    }
+  })(Function);
+
+  function test() {
+    console.log(this, arguments)
+  }
+  test.myApply({
+    a: 1,
+    b: 2
+  }, ['sz', 'a'])
+</script>
+
+<script>
+  // es6
+  const utilsModule = ((Function) => {
+    Function.prototype.myApply = function (obj, arr) {
+      obj = obj == null ? window : Object(obj)
+      let args = [];
+      let val;
+      for (let i = 0; i < arr.length; i++) {
+        args.push(arr[i]);
+      }
+      obj._fn_ = this;
+      val = eval('obj._fn_(...args)')
+      delete obj._fn_;
+      return val
+    }
+  })(Function);
+
+  function test() {
+    console.log(this, arguments)
+  }
+  test.myApply({
+    a: 1,
+    b: 2
+  }, ['sz', 'a'])
+</script>

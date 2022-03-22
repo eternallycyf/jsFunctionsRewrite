@@ -1,0 +1,59 @@
+<script>
+  var arr = [
+    { name: 'zs', age: 1 },
+    { name: 'l4', age: 2 },
+    { name: 'w5', age: 3 },
+    { name: 'ss', age: 4 },
+  ]
+  var obj = {
+    name: 'thisArg',
+    age: 2222
+  }
+  // var newArr = arr.map(function (item, index, arr) {
+  //   console.log(item, index, arr, this);
+  //   return item.name
+  // }, obj)
+  // console.log(newArr)
+  function deepClone(origin, hashMap = new WeakMap()) {
+    if (origin == undefined || typeof origin !== 'object') {
+      return origin
+    }
+    if (origin instanceof Date) {
+      return new Date(origin)
+    }
+    if (origin instanceof RegExp) {
+      return new RegExp(origin)
+    }
+    const hashKey = hashMap.get(origin);
+    if (hashKey) {
+      return hashKey;
+    }
+    const target = new origin.constructor()
+    hashMap.set(origin, target)
+    for (let k in origin) {
+      if (origin.hasOwnProperty(k)) {
+        target[k] = deepClone(origin[k], hashMap)
+      }
+    }
+    return target
+  }
+  Array.prototype.myMap = function (cb) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg2 = arguments[1] || window;
+    var _newArr = []
+    var _item;
+    var _res;
+    for (let i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i]);
+      var res = cb.apply(_arg2, [_item, i, _arr]);
+      _res && _newArr.push(_res);
+    }
+    return _newArr
+  }
+  var newArr = arr.myMap(function (item, index, arr) {
+    console.log(item, index, arr, this);
+    return item.name
+  }, obj)
+  console.log(newArr)
+</script>

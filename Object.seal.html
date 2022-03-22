@@ -1,0 +1,18 @@
+<script>
+  Object.deepSeal = function (o) {
+    // Objcet.keys() 拿不到不可枚举的属性
+    var _keys = Object.getOwnPropertyNames(o);
+    if (_keys.length) {
+      _keys.forEach(function (k) {
+        var _value = o[k];
+
+        if (typeof _value === 'object' && _value !== null) {
+          Object.deepSeal(_value);
+        }
+      })
+    }
+    return Object.Seal(o)
+  }
+  Object.deepSeal(o)
+  o.c.e.f = 2222;  // false
+</script>

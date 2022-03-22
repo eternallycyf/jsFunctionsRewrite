@@ -1,0 +1,30 @@
+<script>
+  const o = {
+    a: 1,
+    b: 2,
+    c: {
+      d: 3,
+      e: {
+        f: 4
+      }
+    }
+  }
+  Object.deepFreeze = function (o) {
+    // Objcet.keys() 拿不到不可枚举的属性
+    var _keys = Object.getOwnPropertyNames(o);
+
+    if (_keys.length) {
+      _keys.forEach(function (k) {
+        var _value = o[k];
+
+        if (typeof _value === 'object' && _value !== null) {
+          Object.deepFreeze(_value);
+        }
+      })
+    }
+
+    return Object.freeze(o)
+  }
+  Object.deepFreeze(o)
+  o.c.e.f = 2222;  // false
+</script>

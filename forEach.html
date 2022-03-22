@@ -1,0 +1,26 @@
+<script>
+  var arr = [
+    { name: 'zs', age: 1 },
+    { name: 'l4', age: 2 },
+    { name: 'w5', age: 3 },
+    { name: 'ss', age: 4 },
+  ]
+  var obj = {
+    name: 'thisArg',
+    age: 2222
+  }
+  // arr.forEach(function (item, index, arr) {
+  //   console.log(item, index, arr, this);
+  // }, obj)
+  Array.prototype.myForEach = function (cb) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg2 = arguments[1] || window;
+    for (let i = 0; i < _len; i++) {
+      cb.apply(_arg2, [_arr[i], i, _arr]);
+    }
+  }
+  arr.myForEach(function (item, index, arr) {
+    console.log(item, index, arr, this);
+  }, obj)
+</script>

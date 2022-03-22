@@ -1,0 +1,23 @@
+<script>
+  function myNew() {
+    var constructor = [].shift.call(arguments)
+    var _this = {};
+    _this.__proto__ = constructor.prototype;
+    var res = constructor.apply(_this, arguments)
+    return typeof res === 'object' ? res : _this
+  }
+
+  function Test(a, b) {
+    this.a = a;
+    this.b = b;
+    // return {
+    //   c: 3,
+    //   d: 4
+    // }
+  }
+  Test.prototype.add = function () {
+    return this.a + this.b;
+  }
+  var test = myNew(Test, 1, 2)
+// console.log(Test(1, 2));
+</script>

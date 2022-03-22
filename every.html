@@ -1,0 +1,35 @@
+<script>
+  var arr = [
+    { name: 'zs', age: 1 },
+    { name: 'l4', age: 2 },
+    { name: 'w5', age: 3 },
+    { name: 'ss', age: 4 },
+  ]
+  var obj = {
+    name: 'thisArg',
+    age: 2222
+  }
+  var flag = arr.every(function (item, index, arr) {
+    console.log(item, index, arr, this);
+    return item.age > 0
+  }, obj)
+  console.log(flag)
+  Array.prototype.myEvery = function (cb) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg2 = arguments[1] || window;
+    var _res = true;
+    for (let i = 0; i < _len; i++) {
+      if (!cb.apply(_arg2, [_arr[i], i, _arr])) {
+        _res = false;
+        break;
+      }
+    }
+    return _res
+  }
+  var flag = arr.myEvery(function (item, index, arr) {
+    console.log(item, index, arr, this);
+    return item.age > 0
+  }, obj)
+  console.log(flag)
+</script>

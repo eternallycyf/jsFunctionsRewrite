@@ -1,0 +1,15 @@
+<script>
+  const obj = { a: 1, b: 2 }
+  Object.prototype.c = 1;
+  const r = Object.entries(obj)
+  // console.log(r)
+  Object.myFromEntries = function (o) {
+    var _obj = {};
+    for (const item of o) {
+      _obj[item[0]] = item[1]
+    }
+    return _obj
+  }
+  const newObj = Object.myFromEntries(r);
+  console.log(newObj);
+</script>

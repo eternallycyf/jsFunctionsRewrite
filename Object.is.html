@@ -1,0 +1,12 @@
+<script>
+  Object.myIs = function (a, b) {
+    if (a === b) {
+      // 1/+0 === Infinity
+      // 1/-0 === -Infinity
+      return a !== 0 || 1 / a === 1 / b
+    }
+    return a !== a && b !== b
+  }
+  const result = Object.myIs(NaN, NaN)
+  console.log(result); // true
+</script>

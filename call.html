@@ -1,0 +1,67 @@
+<script>
+  // 如果直接Push具体的值  args.push(arguments[i])
+  // eval执行的时候会自动调用 toString()将数组转成字符串
+  // 但是外界并没有这个变量
+  // ['zs,ls'].toString() => zs,ls
+  // ctx.originFn(zs,ls) 
+
+  // 直接push字符串 args.push('arguments[' + i + ']')
+  // 自动转换后可以获取到这个变量
+  // ['arguments[1]', 'arguments[2]']  =>
+  //       arguments[1],arguments[2]
+  // ctx.originFn(arguments[1],arguments[2]) 
+
+  const utilsModule = ((Function) => {
+    Function.prototype.myCall = function (ctx) {
+      ctx = ctx ? Object(ctx) : window;
+      ctx.originFn = this;
+      var args = [];
+      // ['arguments[1]', 'arguments[2]']
+
+      for (var i = 1; i < arguments.length; i++) {
+        args.push('arguments[' + i + ']')
+      }
+      var ret = eval('ctx.originFn(' + args + ')')
+      delete ctx.originFn
+      return ret
+    }
+  })(Function);
+
+  function test() {
+    console.log(this, arguments)
+  }
+
+  test.myCall({
+    a: 1,
+    b: 2,
+    test() {
+      console.log(this)
+    }
+  }, 'zs', 'lisi')
+</script>
+
+<script>
+  // es6
+  const utilsModule = ((Function) => {
+    Function.prototype.myCall = function (obj, ...arg) {
+      obj = obj == null ? window : Object(obj);
+      let val;
+      obj._fn_ = this;
+      val = obj._fn_(...arg);
+      delete obj._fn_;
+      return val;
+    }
+  })(Function);
+
+  function test() {
+    console.log(this, arguments)
+  }
+
+  test.myCall({
+    a: 1,
+    b: 2,
+    test() {
+      console.log(this)
+    }
+  }, 'zs', 'lisi')
+</script>

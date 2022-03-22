@@ -1,0 +1,165 @@
+<script>
+  const PENDING = 'PENDING';
+  const FULFILL = 'FULFILL';
+  const REJECTED = 'REJECTED';
+
+  function resolvePromise(promise2, x, resolve, reject) {
+    if (promise2 === x) {
+      return reject(new TypeError('Chaining cycle detected from promise #<MyPromise>'));
+    }
+    let called = false;
+    if ((typeof x === 'object' && x !== null || typeof x === 'function')) {
+      try {
+        let then = x.then;
+        if (typeof then === 'function') {
+          then.call(x, (y) => {
+            if (called) return;
+            called = true;
+            resolvePromise(promise2, y, resolve, reject);
+          }, (r) => {
+            if (called) return;
+            called = true;
+            reject(r)
+          })
+        } else {
+          resolve(x)
+        }
+      } catch (e) {
+        if (called) return;
+        called = true;
+        reject(e);
+      }
+    } else {
+      resolve(x)
+    }
+  }
+
+  class myPromise {
+    constructor(executor) {
+      this.status = PENDING;
+      this.value = undefined;
+      this.reason = undefined;
+      this.onFulfilledCallbacks = [];
+      this.onRejectedCallbacks = [];
+      const resolve = (value) => {
+        if (this.status === PENDING) {
+          this.status = FULFILL;
+          this.value = value;
+          this.onFulfilledCallbacks.forEach(cb => cb());
+        }
+      }
+      const reject = (reason) => {
+        if (this.status === PENDING) {
+          this.status = REJECTED;
+          this.reason = reason;
+          this.onRejectedCallbacks.forEach(cb => cb());
+        }
+      }
+      try {
+        executor(resolve, reject);
+      } catch (error) {
+        reject(error);
+      }
+    }
+    then(onFulfilled, onRejected) {
+      onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+      onRejected = typeof onRejected === 'function' ? onRejected : reson => { throw reason }
+      let promise2 = new myPromise((resolve, reject) => {
+        if (this.status === FULFILL) {
+          setTimeout(() => {
+            try {
+              let x = onFulfilled(this.value);
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (error) {
+              reject(error);
+            }
+          }, 0)
+        }
+        if (this.status === REJECTED) {
+          setTimeout(() => {
+            try {
+              let x = onRejected(this.reason)
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (error) {
+              reject(error);
+            }
+          }, 0)
+        }
+        if (this.status === PENDING) {
+          this.onFulfilledCallbacks.push(() => {
+            try {
+              let x = onFulfilled(this.value);
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (error) {
+              reject(error);
+            }
+          })
+          this.onRejectedCallbacks.push(() => {
+            try {
+              let x = onRejected(this.reason)
+              resolvePromise(promise2, x, resolve, reject);
+            } catch (error) {
+              reject(error);
+            }
+          })
+        }
+      })
+      return promise2
+    }
+    catch(errorCallback) {
+      return this.then(null, errorCallback);
+    }
+  }
+
+
+  let promise1 = new myPromise((resolve, reject) => {
+    resolve('First resolve')
+    // reject(new Error('Error'))
+  })
+
+  let promise2 = promise1.then((value) => {
+    // return 'then promise';
+    // return new Error('Error')
+    // return Promise.resolve('promise resolve');
+    return new myPromise((resolve, reject) => {
+      // resolve('new mypromise resolve')
+
+      // setTimeout(() => {
+      //   resolve('new mypromise resolve')
+      // }, 2000);
+
+      setTimeout(() => {
+        resolve(new myPromise((resolve, reject) => {
+          resolve(new myPromise((resolve, reject) => {
+            resolve('new mypromise resolve')
+          }))
+        }))
+      }, 2000);
+
+    })
+  }, (reason) => {
+    return reason
+  })
+
+  // promise2.then((value) => {
+  //   console.log(value)  // 1
+  // }, (reason) => {
+  //   console.log(reason) // Error
+  // })
+
+  // promise2.then().then().then().then().then((value) => {
+  //   console.log(value)  // 1
+  // }, (reason) => {
+  //   console.log(reason) // Error
+  // })
+
+  promise2.then().then().then().then().then((value) => {
+    throw new Error('Error')
+  }, (reason) => {
+    console.log(reason) // Error
+  })
+    .catch((e) => {
+      console.log(e)
+    })
+
+</script>

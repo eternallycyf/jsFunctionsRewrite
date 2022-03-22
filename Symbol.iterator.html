@@ -1,0 +1,24 @@
+<script>
+  const o = {
+    0: 1,
+    1: 2,
+    2: 3,
+    length: 3
+  }
+  Object.prototype[Symbol.iterator] = function () {
+    var index = 0;
+    var _this = this;
+    return {
+      next() {
+        return index < _this.length
+          ?
+          { value: _this[index++], done: false }
+          :
+          { value: undefined, done: true }
+      }
+    }
+  }
+  for (const v of o) {
+    console.log(v)  // 1 2 3
+  }
+</script>

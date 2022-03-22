@@ -1,0 +1,17 @@
+<script>
+  class Test { };
+  const test = new Test();
+  function instanceOf(target, type) {
+    type = type.prototype;
+    target = target.__proto__;
+    while (true) {
+      if (target === null) return false;
+      if (target === type) return true
+      target = target.__proto__;
+    }
+  }
+  console.log(test instanceof Test)   // true
+  console.log(instanceOf(test, Test)) // true
+  console.log(instanceOf([], Array))  // true
+  console.log(instanceOf([], Object)) // true
+</script>

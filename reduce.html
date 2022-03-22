@@ -1,0 +1,56 @@
+<script>
+  var arr = [
+    { name: 'zs', age: 1 },
+    { name: 'l4', age: 2 },
+    { name: 'w5', age: 3 },
+    { name: 'ss', age: 4 },
+  ]
+  var obj = {
+    name: 'thisArg',
+    age: 2222
+  }
+  // var flag = arr.reduce(function (prev, item, index, arr) {
+  //   console.log(prev);
+  //   return item.age > 2 && prev + item.age
+  // }, 0)
+  // console.log(flag)
+  function deepClone(origin, hashMap = new WeakMap()) {
+    if (origin == undefined || typeof origin !== 'object') {
+      return origin
+    }
+    if (origin instanceof Date) {
+      return new Date(origin)
+    }
+    if (origin instanceof RegExp) {
+      return new RegExp(origin)
+    }
+    const hashKey = hashMap.get(origin);
+    if (hashKey) {
+      return hashKey;
+    }
+    const target = new origin.constructor()
+    hashMap.set(origin, target)
+    for (let k in origin) {
+      if (origin.hasOwnProperty(k)) {
+        target[k] = deepClone(origin[k], hashMap)
+      }
+    }
+    return target
+  }
+  Array.prototype.myReduce = function (cb, initValue) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg3 = arguments[2] || window;
+    var _item;
+    for (let i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i])
+      initValue = cb.apply(_arg3, [initValue, _item, i, _arr])
+    }
+    return initValue;
+  }
+  var flag = arr.myReduce(function (prev, item, index, arr) {
+    console.log(prev, this);
+    return item.age > 2 && prev + item.age
+  }, 0, obj)
+  console.log(flag)
+</script>

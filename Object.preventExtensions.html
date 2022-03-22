@@ -1,0 +1,26 @@
+<script>
+  const obj = {
+    a: 1,
+    b: {
+      c: {
+        d: 3
+      }
+    }
+  }
+  Object.deepPreventExtensions = function (o) {
+    var _keys = Object.getOwnPropertyNames(o)
+    if (_keys.length) {
+      _keys.forEach((k) => {
+        var _v = o[k];
+        if (typeof _v === 'object' && _v !== null) {
+          Object.deepPreventExtensions(_v)
+        }
+      })
+    }
+    return Object.preventExtensions(o)
+  }
+
+  Object.deepPreventExtensions(obj)
+  obj.b.c.e = 5
+  console.log(obj);  // 不存在e
+</script>
