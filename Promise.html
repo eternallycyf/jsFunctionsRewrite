@@ -114,6 +114,89 @@
     }
   }
 
+  myPromise.prototype.all = function (promises) {
+    return new Promise((resolve, reject) => {
+      let arr = [];
+      let count = 0;
+      for (let i = 0; i < promises.length; i++) {
+        Promise.resolve(promises[i])
+          .then((value) => {
+            arr[i] = value;
+            count++;
+
+            if (count === promises.length) {
+              resolve(arr);
+            }
+          })
+          .catch((reason) => {
+            reject(reason);
+          })
+      }
+    })
+  }
+
+  myPromise.prototype.race = function (promises) {
+    return new Promise((resolve, reject) => {
+      promises.forEach(element => {
+        Promise.resolve(element).then(resolve, reject);
+      });
+    })
+  }
+
+  myPromise.prototype.any = function (promises) {
+    return new Promise((resolve, reject) => {
+      let arr = [];
+      let count = 0;
+      promises.forEach((item, i) => {
+        promises.resolve(item).then(resolve, reason => {
+          arr[i] = { status: 'rejected', value: reason }
+          count++;
+
+          if (count === promises.length) {
+            reject(new Error('no promise success'))
+          }
+        })
+      })
+    })
+  }
+
+  myPromise.prototype.allSettled = function (promises) {
+    return new Promise((resolve, reject) => {
+      let arr = [];
+      let count = 0;
+
+      const processResult = (res, index, status) => {
+        arr[i] = { status: status, value: res }
+        count++;
+        if (count === promises.length) {
+          resolve(arr)
+        }
+      }
+
+      promises.forEach((item, i) => {
+        Promise.resolve(item)
+          .then(value => {
+            processResult(value, i, 'resolve')
+          },
+            reason => {
+              processResult(reason, i, 'rejected')
+            }
+          )
+      })
+    })
+  }
+
+  myPromise.prototype.finally = function (callback) {
+    return this.then(
+      (value) => {
+        Promise.resolve(callback()).then(() => value)
+      },
+      (reason) => {
+        Promise.reject(callback()).then(() => reason)
+      }
+    );
+  }
+
 
   let promise1 = new myPromise((resolve, reject) => {
     resolve('First resolve')
